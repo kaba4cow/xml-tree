@@ -2,6 +2,8 @@ package com.kaba4cow.xmltree;
 
 import java.util.Objects;
 
+import com.kaba4cow.stringview.StringView;
+
 /**
  * Represents an XML attribute with a name and value.
  * 
@@ -63,6 +65,15 @@ public class XMLAttribute extends XMLObject {
 	public XMLAttribute setValue(Object value) {
 		this.value = value;
 		return this;
+	}
+
+	/**
+	 * Creates a {@link StringView} for string representation of the value.
+	 * 
+	 * @return a new {@link StringView} for the value
+	 */
+	public StringView viewValue() {
+		return new StringView(Objects.toString(value));
 	}
 
 	/**

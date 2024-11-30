@@ -10,6 +10,11 @@ A lightweight **Java** library for parsing, creating, and manipulating **XML** d
 - Flexible node and attribute management
 - Easy serialization to **XML** string format
 - Support for nested nodes and complex **XML** structures
+- `StringViewer` support for flexible conversion of `XMLAttribute` value and `XMLText` text
+
+## Dependencies
+
+The library depends on **[StringView](https://github.com/kaba4cow/string-view)** to provide functionality for `XMLAttribute` value and `XMLText` text conversions.
 
 ## Key Classes
 
@@ -35,7 +40,7 @@ Handles text content within **XML** nodes with:
 
 ## Usage
 
-- Creating an **XML** Document
+### Creating an **XML** Document
 
 ```java
 XMLNode root = new XMLNode();
@@ -51,7 +56,7 @@ author.getText().setText("The baz");
 String xmlString = root.toXMLString();
 ```
 
-- Parsing an Existing **XML** String
+### Parsing an Existing **XML** String
 
 ```java
 XMLNode parsedDocument = new XMLNode("<root><foo id='105'>The foo</foo></root>");
@@ -60,7 +65,7 @@ XMLNode foo = parsedDocument.getNode("foo");
 String id = book.getAttribute("id").getValue().toString();
 ```
 
-- Advanced Node Manipulation
+### Advanced Node Manipulation
 
 ```java
 List<XMLNode> filteredNodes = xmlNode.getNodes(node -> 
@@ -75,7 +80,7 @@ xmlNode.sortNodes(Comparator.comparing(node ->
 
 ## Key Methods
 
-XMLNode:
+### XMLNode
 
 - `addNode(String tag)`: Add a new child node
 - `getNode(String tag)`: Retrieve a child node by tag
@@ -83,14 +88,16 @@ XMLNode:
 - `getAttributes()`: Get all attributes
 - `addAttribute(String name)`: Add a new attribute
 
-XMLAttribute:
+### XMLAttribute
 
 - `setName(String name)`: Set attribute name
 - `setValue(Object value)`: Set attribute value
+- `viewValue()`: Create a `StringViewer` for the value
 
-XMLText:
+### XMLText
 
 - `setText(String text)`: Set node text content
+- `viewText()`: Create a `StringViewer` for the text
 
 ## Error Handling
 

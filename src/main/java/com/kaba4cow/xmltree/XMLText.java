@@ -1,5 +1,7 @@
 package com.kaba4cow.xmltree;
 
+import com.kaba4cow.stringview.StringView;
+
 /**
  * Represents an XML node text content.
  * 
@@ -34,6 +36,15 @@ public class XMLText extends XMLObject {
 	public XMLText setText(String text) {
 		this.text = text;
 		return this;
+	}
+
+	/**
+	 * Creates a {@link StringView} for the text.
+	 * 
+	 * @return a new {@link StringView} for the text
+	 */
+	public StringView viewText() {
+		return new StringView(text);
 	}
 
 	/**
