@@ -1,6 +1,6 @@
 package com.kaba4cow.xmltree;
 
-import java.util.Objects;
+import java.util.Optional;
 
 import com.kaba4cow.stringview.StringView;
 
@@ -13,7 +13,7 @@ import com.kaba4cow.stringview.StringView;
 public class XMLAttribute extends XMLObject {
 
 	private String name;
-	private Object value;
+	private String value;
 
 	XMLAttribute(XMLNode parent) {
 		super(parent);
@@ -28,6 +28,15 @@ public class XMLAttribute extends XMLObject {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Retrieves the optional name.
+	 * 
+	 * @return an {@link Optional} containing the name
+	 */
+	public Optional<String> optName() {
+		return Optional.ofNullable(name);
 	}
 
 	/**
@@ -51,8 +60,17 @@ public class XMLAttribute extends XMLObject {
 	 *
 	 * @return the attribute value
 	 */
-	public Object getValue() {
+	public String getValue() {
 		return value;
+	}
+
+	/**
+	 * Retrieves the optional value.
+	 * 
+	 * @return an {@link Optional} containing the value
+	 */
+	public Optional<String> optText() {
+		return Optional.ofNullable(value);
 	}
 
 	/**
@@ -62,18 +80,18 @@ public class XMLAttribute extends XMLObject {
 	 * 
 	 * @return a reference to this object
 	 */
-	public XMLAttribute setValue(Object value) {
+	public XMLAttribute setValue(String value) {
 		this.value = value;
 		return this;
 	}
 
 	/**
-	 * Creates a {@link StringView} for string representation of the value.
+	 * Creates a {@link StringView} for the value.
 	 * 
 	 * @return a new {@link StringView} for the value
 	 */
 	public StringView viewValue() {
-		return new StringView(Objects.toString(value));
+		return new StringView(value);
 	}
 
 	/**
@@ -83,7 +101,7 @@ public class XMLAttribute extends XMLObject {
 	 */
 	@Override
 	public String toXMLString() {
-		return String.format("%s=\"%s\"", escapeString(name), escapeString(Objects.toString(value)));
+		return String.format("%s=\"%s\"", escapeString(name), escapeString(value));
 	}
 
 	@Override

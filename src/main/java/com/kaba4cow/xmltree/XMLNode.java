@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.kaba4cow.stringview.StringView;
+
 /**
  * Represents a node in an XML document, capable of containing child nodes, attributes, and text.
  * 
@@ -289,6 +291,17 @@ public class XMLNode extends XMLObject {
 	 */
 	public Optional<XMLAttribute> optAttribute(String name) {
 		return Optional.ofNullable(getAttribute(name));
+	}
+
+	/**
+	 * Creates an optional {@link StringView} for the value of an attribute with a matching name.
+	 *
+	 * @param name the name to search for
+	 * 
+	 * @return an {@link Optional} containing {@link StringViewer} for the value of the first matching {@link XMLAttribute}
+	 */
+	public Optional<StringView> viewAttributeValue(String name) {
+		return optAttribute(name).map(XMLAttribute::viewValue);
 	}
 
 	/**

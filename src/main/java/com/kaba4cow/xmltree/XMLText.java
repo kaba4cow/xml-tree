@@ -1,5 +1,7 @@
 package com.kaba4cow.xmltree;
 
+import java.util.Optional;
+
 import com.kaba4cow.stringview.StringView;
 
 /**
@@ -24,6 +26,15 @@ public class XMLText extends XMLObject {
 	 */
 	public String getText() {
 		return text;
+	}
+
+	/**
+	 * Retrieves the optional text content.
+	 * 
+	 * @return an {@link Optional} containing the text
+	 */
+	public Optional<String> optText() {
+		return Optional.ofNullable(text);
 	}
 
 	/**

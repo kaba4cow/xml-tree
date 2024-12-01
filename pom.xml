@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.kaba4cow</groupId>
 	<artifactId>xml-tree</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<name>XML Tree</name>
 	<description>A lightweight Java library for parsing and managing XML
 		documents</description>

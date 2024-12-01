@@ -91,7 +91,7 @@ xmlNode.sortNodes(Comparator.comparing(node ->
 ### XMLAttribute
 
 - `setName(String name)`: Set attribute name
-- `setValue(Object value)`: Set attribute value
+- `setValue(String value)`: Set attribute value
 - `viewValue()`: Create a `StringViewer` for the value
 
 ### XMLText
