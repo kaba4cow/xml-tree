@@ -1,104 +1,143 @@
 package com.kaba4cow.xmltree;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 class XMLParser {
 
-	private static final Pattern DECLARATION_PATTERN = Pattern.compile("<\\?xml.*?\\?>");
-	private static final Pattern COMMENT_PATTERN = Pattern.compile("<!--.*?-->");
-	private static final Pattern TAG_PATTERN = Pattern.compile("<([^\\s>/]+)([^>]*)>(.*?)</\\1>", Pattern.DOTALL);
-	private static final Pattern SELF_CLOSING_TAG_PATTERN = Pattern.compile("<([^\\s>/]+)([^>]*?)/?>", Pattern.DOTALL);
-	private static final Pattern NAMESPACE_PATTERN = Pattern.compile("xmlns:(\\w+)\\s*=\\s*\"([^\"]+)\"");
-	private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("(\\w+)(?::?\\w*)?\\s*=\\s*\"([^\"]*)\"");
+	private XMLParserNode root;
 
-	private XMLParser() {}
-
-	public static void parseXML(XMLNode node, String source) {
-		source = source.trim();
-		source = removeXmlDeclaration(source);
-		source = removeComments(source);
-		source = source.trim();
-		Matcher fullTagMatcher = TAG_PATTERN.matcher(source);
-		Matcher selfClosingTagMatcher = SELF_CLOSING_TAG_PATTERN.matcher(source);
-		if (fullTagMatcher.matches())
-			parseFullTag(node, fullTagMatcher);
-		else if (selfClosingTagMatcher.matches())
-			parseSelfClosingTag(node, selfClosingTagMatcher);
-		else
-			throw new IllegalArgumentException("Invalid XML structure");
+	public XMLParser() {
+		this.root = null;
 	}
 
-	private static void parseFullTag(XMLNode node, Matcher matcher) {
-		String tagName = matcher.group(1);
-		node.setTag(tagName);
-		String attributeString = matcher.group(2);
-		parseAttributes(node, attributeString);
-		String content = matcher.group(3).trim();
-		parseContent(node, content);
+	public void to(XMLNode output) {
+		root.copy(output);
 	}
 
-	private static void parseSelfClosingTag(XMLNode node, Matcher matcher) {
-		String tagName = matcher.group(1);
-		node.setTag(tagName);
-		String attributeString = matcher.group(2);
-		parseAttributes(node, attributeString);
-	}
-
-	public static String removeXmlDeclaration(String source) {
-		return DECLARATION_PATTERN.matcher(source).replaceAll("").trim();
-	}
-
-	public static String removeComments(String source) {
-		return COMMENT_PATTERN.matcher(source).replaceAll("").trim();
-	}
-
-	public static void parseAttributes(XMLNode node, String attributeString) {
-		Matcher namespaceMatcher = NAMESPACE_PATTERN.matcher(attributeString);
-		while (namespaceMatcher.find()) {
-			String prefix = namespaceMatcher.group(1);
-			String uri = namespaceMatcher.group(2);
-			node.addAttribute("xmlns:" + prefix).setValue(uri);
+	public XMLParser parse(String input) {
+		Stack<XMLParserNode> stack = new Stack<>();
+		StringBuilder builder = new StringBuilder();
+		boolean inside = false;
+		char[] chars = input.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			char c = chars[i];
+			if (c == '<') {
+				if (builder.length() > 0 && !stack.isEmpty()) {
+					stack.peek().setText(builder.toString().trim());
+					builder.setLength(0);
+				}
+				inside = true;
+				if (i < chars.length - 1 && chars[i + 1] == '?') {
+					i = skipUntil(chars, i, "?>");
+					inside = false;
+				} else if (i < chars.length - 3 && chars[i + 1] == '!' && chars[i + 2] == '-' && chars[i + 3] == '-') {
+					i = skipUntil(chars, i, "-->");
+					inside = false;
+				}
+			} else if (c == '>') {
+				if (inside) {
+					String tag = builder.toString().trim();
+					builder.setLength(0);
+					inside = false;
+					if (tag.startsWith("/"))
+						stack.pop();
+					else {
+						boolean selfClosing = tag.endsWith("/");
+						if (selfClosing)
+							tag = tag.substring(0, tag.length() - 1).trim();
+						XMLParserNode node = parseTag(tag);
+						if (stack.isEmpty())
+							root = node;
+						else
+							stack.peek().addNode(node);
+						if (!selfClosing)
+							stack.push(node);
+					}
+				}
+			} else
+				builder.append(c);
 		}
-		Matcher attributeMatcher = ATTRIBUTE_PATTERN.matcher(attributeString);
-		while (attributeMatcher.find()) {
-			String name = attributeMatcher.group(1);
-			String value = attributeMatcher.group(2);
-			if (!name.startsWith("xmlns")) {
-				XMLAttribute attribute = node.addAttribute(name);
-				attribute.setValue(value);
+		return this;
+	}
+
+	private int skipUntil(char[] chars, int start, String end) {
+		for (int i = start; i < chars.length - end.length() + 1; i++) {
+			boolean match = true;
+			for (int j = 0; j < end.length(); j++)
+				if (chars[i + j] != end.charAt(j)) {
+					match = false;
+					break;
+				}
+			if (match)
+				return i + end.length() - 1;
+		}
+		return chars.length - 1;
+	}
+
+	private XMLParserNode parseTag(String tag) {
+		String[] parts = tag.split("\\s+", 2);
+		XMLParserNode node = new XMLParserNode().setTag(parts[0]);
+		if (parts.length > 1) {
+			String[] attributes = parts[1].split("\\s+");
+			for (String attribute : attributes) {
+				int index = attribute.indexOf('=');
+				if (index != -1) {
+					String name = attribute.substring(0, index);
+					String value = attribute.substring(index + 1).replace("\"", "");
+					node.addAttribute(name, value);
+				}
 			}
 		}
+		return node;
 	}
 
-	public static void parseContent(XMLNode node, String content) {
-		content = content.trim();
-		if (content.isEmpty())
-			return;
-		if (!content.contains("<")) {
-			node.getText().setText(content);
-			return;
+	private class XMLParserNode {
+
+		private String tag;
+		private String text;
+		private final List<XMLParserNode> nodes;
+		private final Map<String, String> attributes;
+
+		private XMLParserNode() {
+			this.tag = null;
+			this.text = null;
+			this.nodes = new ArrayList<>();
+			this.attributes = new LinkedHashMap<>();
 		}
-		Matcher fullTagMatcher = TAG_PATTERN.matcher(content);
-		Matcher selfClosingTagMatcher = SELF_CLOSING_TAG_PATTERN.matcher(content);
-		int lastIndex = 0;
-		while (fullTagMatcher.find(lastIndex) || selfClosingTagMatcher.find(lastIndex)) {
-			Matcher currentMatcher = fullTagMatcher.find(lastIndex) ? fullTagMatcher : selfClosingTagMatcher;
-			if (currentMatcher.start() > lastIndex) {
-				String textBefore = content.substring(lastIndex, currentMatcher.start()).trim();
-				if (!textBefore.isEmpty())
-					node.getText().setText(textBefore);
-			}
-			String matchedTag = currentMatcher.group(0);
-			XMLNode childNode = node.addNode(null);
-			parseXML(childNode, matchedTag);
-			lastIndex = currentMatcher.end();
+
+		private void copy(XMLNode output) {
+			output.setTag(tag);
+			output.setText(text);
+			for (Map.Entry<String, String> attribute : attributes.entrySet())
+				output.addAttribute(attribute.getKey()).setValue(attribute.getValue());
+			for (XMLParserNode node : nodes)
+				node.copy(output.addNode(null));
 		}
-		if (lastIndex < content.length()) {
-			String remainingText = content.substring(lastIndex).trim();
-			if (!remainingText.isEmpty())
-				node.getText().setText(remainingText);
+
+		private XMLParserNode setTag(String tag) {
+			this.tag = tag;
+			return this;
 		}
+
+		private XMLParserNode setText(String text) {
+			this.text = text;
+			return this;
+		}
+
+		private XMLParserNode addNode(XMLParserNode node) {
+			this.nodes.add(node);
+			return this;
+		}
+
+		private XMLParserNode addAttribute(String name, String value) {
+			this.attributes.put(name, value);
+			return this;
+		}
+
 	}
 
 }

@@ -21,7 +21,7 @@ public class XMLNode extends XMLObject {
 
 	private final List<XMLNode> nodes;
 	private final List<XMLAttribute> attributes;
-	private final XMLText text;
+	private String text;
 
 	private String tag;
 
@@ -39,14 +39,14 @@ public class XMLNode extends XMLObject {
 	 */
 	public XMLNode(String source) {
 		this();
-		XMLParser.parseXML(this, source);
+		new XMLParser().parse(source).to(this);
 	}
 
 	XMLNode(XMLNode parent) {
 		super(parent);
 		this.nodes = new ArrayList<>();
 		this.attributes = new ArrayList<>();
-		this.text = new XMLText(this);
+		this.text = null;
 		this.tag = null;
 	}
 
@@ -435,10 +435,40 @@ public class XMLNode extends XMLObject {
 	/**
 	 * Retrieves the text content of the node.
 	 *
-	 * @return the {@link XMLText} associated with this node
+	 * @return the text content of this node
 	 */
-	public XMLText getText() {
+	public String getText() {
 		return text;
+	}
+
+	/**
+	 * Retrieves the optional text content of the node.
+	 * 
+	 * @return an {@link Optional} containing the text content of this node
+	 */
+	public Optional<String> optText() {
+		return Optional.ofNullable(text);
+	}
+
+	/**
+	 * Sets the text content of the node.
+	 *
+	 * @param text the new text content
+	 * 
+	 * @return a reference to this object
+	 */
+	public XMLNode setText(String text) {
+		this.text = text;
+		return this;
+	}
+
+	/**
+	 * Creates a {@link StringView} for the text content of the node.
+	 * 
+	 * @return a new {@link StringView} for the text content of this node
+	 */
+	public StringView viewText() {
+		return new StringView(text);
 	}
 
 	/**
@@ -447,7 +477,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if text content exists and is not just whitespace, {@code false} otherwise
 	 */
 	public boolean hasText() {
-		return Objects.nonNull(text.getText()) && !text.getText().trim().isEmpty();
+		return Objects.nonNull(text) && !text.trim().isEmpty();
 	}
 
 	/**
@@ -491,7 +521,7 @@ public class XMLNode extends XMLObject {
 		if (hasNodes())
 			nodeString = nodes.stream().map(node -> node.toXMLString(indent, level + 1)).collect(Collectors.joining("\n"));
 		else if (hasText())
-			textString = text.toXMLString();
+			textString = escapeString(text);
 		if (Objects.isNull(nodeString) && Objects.isNull(textString))
 			builder.append("/>");
 		else {
