@@ -130,6 +130,17 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
+	 * Retrieves child nodes with a specified tag.
+	 *
+	 * @param tag the tag to search for
+	 * 
+	 * @return a list of nodes with the specified tag
+	 */
+	public List<XMLNode> getNodes(String tag) {
+		return getNodes(node -> Objects.equals(node.getTag(), tag));
+	}
+
+	/**
 	 * Adds a new child node with the specified tag.
 	 *
 	 * @param tag the tag for the new node
@@ -190,6 +201,17 @@ public class XMLNode extends XMLObject {
 	public XMLNode removeNodes(Predicate<XMLNode> predicate) {
 		nodes.removeIf(predicate);
 		return this;
+	}
+
+	/**
+	 * Removes child nodes with a specified tag.
+	 *
+	 * @param tag the tag to search for removal
+	 * 
+	 * @return a reference to this object
+	 */
+	public XMLNode removeNodes(String tag) {
+		return removeNodes(node -> Objects.equals(node.getTag(), tag));
 	}
 
 	/**
@@ -468,7 +490,7 @@ public class XMLNode extends XMLObject {
 	 * @return a new {@link StringView} for the text content of this node
 	 */
 	public StringView viewText() {
-		return new StringView(text);
+		return StringView.view(text);
 	}
 
 	/**

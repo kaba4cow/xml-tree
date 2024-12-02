@@ -91,7 +91,7 @@ public class XMLAttribute extends XMLObject {
 	 * @return a new {@link StringView} for the value
 	 */
 	public StringView viewValue() {
-		return new StringView(value);
+		return StringView.view(value);
 	}
 
 	/**
