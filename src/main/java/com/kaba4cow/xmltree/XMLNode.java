@@ -94,6 +94,31 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
+	 * Retrieves first child node matching a given predicate.
+	 *
+	 * @param predicate the condition to filter nodes
+	 * 
+	 * @return the first node matching the predicate, or {@code null}
+	 */
+	public XMLNode getNode(Predicate<XMLNode> predicate) {
+		for (XMLNode node : nodes)
+			if (predicate.test(node))
+				return node;
+		return null;
+	}
+
+	/**
+	 * Retrieves an optional first child node matching a given predicate.
+	 *
+	 * @param predicate the condition to filter nodes
+	 * 
+	 * @return an {@link Optional} containing the first node matching the predicate
+	 */
+	public Optional<XMLNode> optNode(Predicate<XMLNode> predicate) {
+		return Optional.ofNullable(getNode(predicate));
+	}
+
+	/**
 	 * Retrieves the first child node with a matching tag.
 	 *
 	 * @param tag the tag to search for
@@ -288,6 +313,31 @@ public class XMLNode extends XMLObject {
 	 */
 	public XMLAttribute getAttribute(int index) {
 		return attributes.get(index);
+	}
+
+	/**
+	 * Retrieves first attribute matching a given predicate.
+	 *
+	 * @param predicate the condition to filter attributes
+	 * 
+	 * @return the first attribute matching the predicate, or {@code null}
+	 */
+	public XMLAttribute getAttribute(Predicate<XMLAttribute> predicate) {
+		for (XMLAttribute attribute : attributes)
+			if (predicate.test(attribute))
+				return attribute;
+		return null;
+	}
+
+	/**
+	 * Retrieves an optional first attribute matching a given predicate.
+	 *
+	 * @param predicate the condition to filter attributes
+	 * 
+	 * @return an {@link Optional} containing the first attribute matching the predicate
+	 */
+	public Optional<XMLAttribute> optAttribute(Predicate<XMLAttribute> predicate) {
+		return Optional.ofNullable(getAttribute(predicate));
 	}
 
 	/**

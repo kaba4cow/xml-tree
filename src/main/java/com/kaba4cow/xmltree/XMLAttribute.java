@@ -56,6 +56,15 @@ public class XMLAttribute extends XMLObject {
 	}
 
 	/**
+	 * Creates a {@link StringView} for the name.
+	 * 
+	 * @return a new {@link StringView} for the name
+	 */
+	public StringView viewName() {
+		return StringView.view(name);
+	}
+
+	/**
 	 * Retrieves the value of the attribute.
 	 *
 	 * @return the attribute value
