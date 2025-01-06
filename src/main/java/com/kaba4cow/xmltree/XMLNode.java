@@ -94,20 +94,6 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
-	 * Retrieves first child node matching a given predicate.
-	 *
-	 * @param predicate the condition to filter nodes
-	 * 
-	 * @return the first node matching the predicate, or {@code null}
-	 */
-	public XMLNode getNode(Predicate<XMLNode> predicate) {
-		for (XMLNode node : nodes)
-			if (predicate.test(node))
-				return node;
-		return null;
-	}
-
-	/**
 	 * Retrieves an optional first child node matching a given predicate.
 	 *
 	 * @param predicate the condition to filter nodes
@@ -115,21 +101,18 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first node matching the predicate
 	 */
 	public Optional<XMLNode> optNode(Predicate<XMLNode> predicate) {
-		return Optional.ofNullable(getNode(predicate));
+		return nodes.stream().filter(predicate).findFirst();
 	}
 
 	/**
-	 * Retrieves the first child node with a matching tag.
+	 * Retrieves first child node matching a given predicate.
 	 *
-	 * @param tag the tag to search for
+	 * @param predicate the condition to filter nodes
 	 * 
-	 * @return the first matching {@link XMLNode}, or {@code null} if no match is found
+	 * @return the first node matching the predicate, or {@code null}
 	 */
-	public XMLNode getNode(String tag) {
-		for (XMLNode node : nodes)
-			if (Objects.equals(node.getTag(), tag))
-				return node;
-		return null;
+	public XMLNode getNode(Predicate<XMLNode> predicate) {
+		return optNode(predicate).orElse(null);
 	}
 
 	/**
@@ -140,7 +123,18 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first matching node
 	 */
 	public Optional<XMLNode> optNode(String tag) {
-		return Optional.ofNullable(getNode(tag));
+		return optNode(XMLPredicates.nodeTagEquals(tag));
+	}
+
+	/**
+	 * Retrieves the first child node with a matching tag.
+	 *
+	 * @param tag the tag to search for
+	 * 
+	 * @return the first matching {@link XMLNode}, or {@code null} if no match is found
+	 */
+	public XMLNode getNode(String tag) {
+		return optNode(tag).orElse(null);
 	}
 
 	/**
@@ -162,7 +156,7 @@ public class XMLNode extends XMLObject {
 	 * @return a list of nodes with the specified tag
 	 */
 	public List<XMLNode> getNodes(String tag) {
-		return getNodes(node -> Objects.equals(node.getTag(), tag));
+		return getNodes(XMLPredicates.nodeTagEquals(tag));
 	}
 
 	/**
@@ -236,7 +230,7 @@ public class XMLNode extends XMLObject {
 	 * @return a reference to this object
 	 */
 	public XMLNode removeNodes(String tag) {
-		return removeNodes(node -> Objects.equals(node.getTag(), tag));
+		return removeNodes(XMLPredicates.nodeTagEquals(tag));
 	}
 
 	/**
@@ -269,10 +263,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if a node with the tag exists, {@code false} otherwise
 	 */
 	public boolean containsNodeTag(String tag) {
-		for (XMLNode node : nodes)
-			if (Objects.equals(node.getTag(), tag))
-				return true;
-		return false;
+		return nodes.stream().anyMatch(XMLPredicates.nodeTagEquals(tag));
 	}
 
 	/**
@@ -316,20 +307,6 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
-	 * Retrieves first attribute matching a given predicate.
-	 *
-	 * @param predicate the condition to filter attributes
-	 * 
-	 * @return the first attribute matching the predicate, or {@code null}
-	 */
-	public XMLAttribute getAttribute(Predicate<XMLAttribute> predicate) {
-		for (XMLAttribute attribute : attributes)
-			if (predicate.test(attribute))
-				return attribute;
-		return null;
-	}
-
-	/**
 	 * Retrieves an optional first attribute matching a given predicate.
 	 *
 	 * @param predicate the condition to filter attributes
@@ -337,21 +314,18 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first attribute matching the predicate
 	 */
 	public Optional<XMLAttribute> optAttribute(Predicate<XMLAttribute> predicate) {
-		return Optional.ofNullable(getAttribute(predicate));
+		return attributes.stream().filter(predicate).findFirst();
 	}
 
 	/**
-	 * Retrieves the first attribute with a matching name.
+	 * Retrieves first attribute matching a given predicate.
 	 *
-	 * @param name the name to search for
+	 * @param predicate the condition to filter attributes
 	 * 
-	 * @return the first matching {@link XMLAttribute}, or {@code null} if no match is found
+	 * @return the first attribute matching the predicate, or {@code null}
 	 */
-	public XMLAttribute getAttribute(String name) {
-		for (XMLAttribute attribute : attributes)
-			if (Objects.equals(attribute.getName(), name))
-				return attribute;
-		return null;
+	public XMLAttribute getAttribute(Predicate<XMLAttribute> predicate) {
+		return optAttribute(predicate).orElse(null);
 	}
 
 	/**
@@ -362,7 +336,18 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first matching {@link XMLAttribute}
 	 */
 	public Optional<XMLAttribute> optAttribute(String name) {
-		return Optional.ofNullable(getAttribute(name));
+		return optAttribute(XMLPredicates.attributeNameEquals(name));
+	}
+
+	/**
+	 * Retrieves the first attribute with a matching name.
+	 *
+	 * @param name the name to search for
+	 * 
+	 * @return the first matching {@link XMLAttribute}, or {@code null} if no match is found
+	 */
+	public XMLAttribute getAttribute(String name) {
+		return optAttribute(name).orElse(null);
 	}
 
 	/**
@@ -480,10 +465,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if an attribute with the name exists, {@code false} otherwise
 	 */
 	public boolean containsAttributeName(String name) {
-		for (XMLAttribute attribute : attributes)
-			if (Objects.equals(attribute.getName(), name))
-				return true;
-		return false;
+		return attributes.stream().anyMatch(XMLPredicates.attributeNameEquals(name));
 	}
 
 	/**

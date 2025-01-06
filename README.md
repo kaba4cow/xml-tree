@@ -10,7 +10,7 @@ A lightweight **Java** library for parsing, creating, and manipulating **XML** d
 - Flexible node and attribute management
 - Easy serialization to **XML** string format
 - Support for nested nodes and complex **XML** structures
-- `StringViewer` support for flexible conversion of `XMLAttribute` values and `XMLNode` texts
+- `StringView` support for flexible conversion of `XMLAttribute` values and `XMLNode` texts
 
 ## Dependencies
 
@@ -31,6 +31,10 @@ The core class representing an **XML** element with the following capabilities:
 Represents **XML** attributes with:
 - Name and value management
 - Unique attribute name validation
+
+### XMLPredicates
+
+Contains helper methods for creating specific predicates for nodes and attributes.
 
 ## Usage
 
@@ -82,13 +86,13 @@ xmlNode.sortNodes(Comparator.comparing(node ->
 - `getAttributes()`: Get all attributes
 - `addAttribute(String name)`: Add a new attribute
 - `setText(String text)`: Set node text content
-- `viewText()`: Create a `StringViewer` for the text content
+- `viewText()`: Create a `StringView` for the text content
 
 ### XMLAttribute
 
 - `setName(String name)`: Set attribute name
 - `setValue(String value)`: Set attribute value
-- `viewValue()`: Create a `StringViewer` for the value
+- `viewValue()`: Create a `StringView` for the value
 
 
 ## Error Handling
