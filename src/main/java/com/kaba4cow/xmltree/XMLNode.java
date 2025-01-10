@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -123,7 +124,7 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first matching node
 	 */
 	public Optional<XMLNode> optNode(String tag) {
-		return optNode(XMLPredicates.nodeTagEquals(tag));
+		return optNode(XMLPredicates.withTag(tag));
 	}
 
 	/**
@@ -156,7 +157,7 @@ public class XMLNode extends XMLObject {
 	 * @return a list of nodes with the specified tag
 	 */
 	public List<XMLNode> getNodes(String tag) {
-		return getNodes(XMLPredicates.nodeTagEquals(tag));
+		return getNodes(XMLPredicates.withTag(tag));
 	}
 
 	/**
@@ -230,7 +231,7 @@ public class XMLNode extends XMLObject {
 	 * @return a reference to this object
 	 */
 	public XMLNode removeNodes(String tag) {
-		return removeNodes(XMLPredicates.nodeTagEquals(tag));
+		return removeNodes(XMLPredicates.withTag(tag));
 	}
 
 	/**
@@ -263,7 +264,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if a node with the tag exists, {@code false} otherwise
 	 */
 	public boolean containsNodeTag(String tag) {
-		return nodes.stream().anyMatch(XMLPredicates.nodeTagEquals(tag));
+		return nodes.stream().anyMatch(XMLPredicates.withTag(tag));
 	}
 
 	/**
@@ -336,7 +337,7 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first matching {@link XMLAttribute}
 	 */
 	public Optional<XMLAttribute> optAttribute(String name) {
-		return optAttribute(XMLPredicates.attributeNameEquals(name));
+		return optAttribute(XMLPredicates.withName(name));
 	}
 
 	/**
@@ -348,17 +349,6 @@ public class XMLNode extends XMLObject {
 	 */
 	public XMLAttribute getAttribute(String name) {
 		return optAttribute(name).orElse(null);
-	}
-
-	/**
-	 * Creates an optional {@link StringView} for the value of an attribute with a matching name.
-	 *
-	 * @param name the name to search for
-	 * 
-	 * @return an {@link Optional} containing {@link StringViewer} for the value of the first matching {@link XMLAttribute}
-	 */
-	public Optional<StringView> viewAttributeValue(String name) {
-		return optAttribute(name).map(XMLAttribute::viewValue);
 	}
 
 	/**
@@ -465,7 +455,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if an attribute with the name exists, {@code false} otherwise
 	 */
 	public boolean containsAttributeName(String name) {
-		return attributes.stream().anyMatch(XMLPredicates.attributeNameEquals(name));
+		return attributes.stream().anyMatch(XMLPredicates.withName(name));
 	}
 
 	/**
@@ -523,6 +513,18 @@ public class XMLNode extends XMLObject {
 	 */
 	public StringView viewText() {
 		return StringView.view(text);
+	}
+
+	/**
+	 * Creates a {@link StringView} for the text content of the node.
+	 * 
+	 * @param view the function to create a specific StringView implementation
+	 * @param <T>  the type of {@link StringView} to create
+	 * 
+	 * @return a new {@link StringView} for the text content of this node
+	 */
+	public <T extends StringView> T viewText(Function<String, T> view) {
+		return StringView.view(text, view);
 	}
 
 	/**

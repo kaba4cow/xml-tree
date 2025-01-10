@@ -41,14 +41,14 @@ abstract class XMLObject {
 	 *
 	 * @return the XML string representation of the object
 	 */
-	public abstract String toXMLString();
+	abstract String toXMLString();
 
 	/**
 	 * Checks if the object has a parent node.
 	 *
 	 * @return {@code true} if the object has a parent, {@code false} otherwise
 	 */
-	public boolean hasParent() {
+	boolean hasParent() {
 		return Objects.nonNull(parent);
 	}
 
@@ -57,7 +57,7 @@ abstract class XMLObject {
 	 *
 	 * @return the parent {@link XMLNode}
 	 */
-	public XMLNode getParent() {
+	XMLNode getParent() {
 		return parent;
 	}
 
