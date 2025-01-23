@@ -1,7 +1,6 @@
 package com.kaba4cow.xmltree;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import com.kaba4cow.stringview.StringView;
 
@@ -62,19 +61,7 @@ public class XMLAttribute extends XMLObject {
 	 * @return a new {@link StringView} for the name
 	 */
 	public StringView viewName() {
-		return StringView.view(name);
-	}
-
-	/**
-	 * Creates a {@link StringView} for the name.
-	 * 
-	 * @param view the function to create a specific StringView implementation
-	 * @param <T>  the type of {@link StringView} to create
-	 * 
-	 * @return a new {@link StringView} for the name
-	 */
-	public <T extends StringView> T viewName(Function<String, T> view) {
-		return StringView.view(name, view);
+		return new StringView(name);
 	}
 
 	/**
@@ -113,19 +100,7 @@ public class XMLAttribute extends XMLObject {
 	 * @return a new {@link StringView} for the value
 	 */
 	public StringView viewValue() {
-		return StringView.view(value);
-	}
-
-	/**
-	 * Creates a {@link StringView} for the value.
-	 * 
-	 * @param view the function to create a specific StringView implementation
-	 * @param <T>  the type of {@link StringView} to create
-	 * 
-	 * @return a new {@link StringView} for the value
-	 */
-	public <T extends StringView> T viewValue(Function<String, T> view) {
-		return StringView.view(value, view);
+		return new StringView(value);
 	}
 
 	/**

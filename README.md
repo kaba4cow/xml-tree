@@ -10,11 +10,11 @@ A lightweight **Java** library for parsing, creating, and manipulating **XML** d
 - Flexible node and attribute management
 - Easy serialization to **XML** string format
 - Support for nested nodes and complex **XML** structures
-- `StringView` support for flexible conversion of `XMLAttribute` values and `XMLNode` texts
+- `StringView` support for flexible conversion of `XMLAttribute` name and value and `XMLNode` tag and text
 
 ## Dependencies
 
-The library depends on **[StringView](https://github.com/kaba4cow/string-view)** to provide functionality for `XMLAttribute` value and `XMLNode` text conversions.
+The library depends on **[StringView](https://github.com/kaba4cow/string-view)** to provide functionality for `XMLAttribute` name and value and `XMLNode` tag and text view.
 
 ## Key Classes
 

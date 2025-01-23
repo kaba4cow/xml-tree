@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -70,6 +69,15 @@ public class XMLNode extends XMLObject {
 	public XMLNode setTag(String tag) {
 		this.tag = tag;
 		return this;
+	}
+
+	/**
+	 * Creates a {@link StringView} for the tag name of the node.
+	 * 
+	 * @return a new {@link StringView} for the tag name of this node
+	 */
+	public StringView viewTag() {
+		return new StringView(tag);
 	}
 
 	/**
@@ -512,19 +520,7 @@ public class XMLNode extends XMLObject {
 	 * @return a new {@link StringView} for the text content of this node
 	 */
 	public StringView viewText() {
-		return StringView.view(text);
-	}
-
-	/**
-	 * Creates a {@link StringView} for the text content of the node.
-	 * 
-	 * @param view the function to create a specific StringView implementation
-	 * @param <T>  the type of {@link StringView} to create
-	 * 
-	 * @return a new {@link StringView} for the text content of this node
-	 */
-	public <T extends StringView> T viewText(Function<String, T> view) {
-		return StringView.view(text, view);
+		return new StringView(text);
 	}
 
 	/**
