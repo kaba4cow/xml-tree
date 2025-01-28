@@ -1,5 +1,6 @@
 package com.kaba4cow.xmltree;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.kaba4cow.stringview.StringView;
@@ -10,7 +11,7 @@ import com.kaba4cow.stringview.StringView;
  * @see XMLNode
  * @see XMLText
  */
-public class XMLAttribute extends XMLObject {
+public class XMLAttribute extends XMLObject implements Comparable<XMLAttribute> {
 
 	private String name;
 	private String value;
@@ -101,6 +102,18 @@ public class XMLAttribute extends XMLObject {
 	 */
 	public StringView viewValue() {
 		return new StringView(value);
+	}
+
+	@Override
+	public int compareTo(XMLAttribute other) {
+		if (name == other.name)
+			return 0;
+		else if (Objects.isNull(name))
+			return -1;
+		else if (Objects.isNull(other.name))
+			return 1;
+		else
+			return name.compareTo(other.name);
 	}
 
 	/**

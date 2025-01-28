@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.kaba4cow.stringview.StringView;
 
@@ -17,13 +18,13 @@ import com.kaba4cow.stringview.StringView;
  * @see XMLAttribute
  * @see XMLText
  */
-public class XMLNode extends XMLObject {
+public class XMLNode extends XMLObject implements Comparable<XMLNode> {
+
+	private String tag;
 
 	private final List<XMLNode> nodes;
 	private final List<XMLAttribute> attributes;
 	private String text;
-
-	private String tag;
 
 	/**
 	 * Creates a new XMLNode with no parent.
@@ -44,10 +45,10 @@ public class XMLNode extends XMLObject {
 
 	XMLNode(XMLNode parent) {
 		super(parent);
+		this.tag = null;
 		this.nodes = new ArrayList<>();
 		this.attributes = new ArrayList<>();
 		this.text = null;
-		this.tag = null;
 	}
 
 	/**
@@ -90,6 +91,15 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
+	 * Returns a sequential {@link Stream} of all child nodes.
+	 *
+	 * @return a stream of child {@link XMLNode}s
+	 */
+	public Stream<XMLNode> streamNodes() {
+		return nodes.stream();
+	}
+
+	/**
 	 * Retrieves a child node by index.
 	 *
 	 * @param index the index of the child node
@@ -110,7 +120,7 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first node matching the predicate
 	 */
 	public Optional<XMLNode> optNode(Predicate<XMLNode> predicate) {
-		return nodes.stream().filter(predicate).findFirst();
+		return streamNodes().filter(predicate).findFirst();
 	}
 
 	/**
@@ -154,7 +164,7 @@ public class XMLNode extends XMLObject {
 	 * @return a list of nodes matching the predicate
 	 */
 	public List<XMLNode> getNodes(Predicate<XMLNode> predicate) {
-		return nodes.stream().filter(predicate).collect(Collectors.toList());
+		return streamNodes().filter(predicate).collect(Collectors.toList());
 	}
 
 	/**
@@ -255,6 +265,16 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
+	 * Sorts nodes by tags.
+	 *
+	 * @return a reference to this object
+	 */
+	public XMLNode sortNodes() {
+		Collections.sort(nodes);
+		return this;
+	}
+
+	/**
 	 * Removes all child nodes.
 	 *
 	 * @return a reference to this object
@@ -272,7 +292,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if a node with the tag exists, {@code false} otherwise
 	 */
 	public boolean containsNodeTag(String tag) {
-		return nodes.stream().anyMatch(XMLPredicates.withTag(tag));
+		return streamNodes().anyMatch(XMLPredicates.withTag(tag));
 	}
 
 	/**
@@ -303,6 +323,15 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
+	 * Returns a sequential {@link Stream} of all attributes.
+	 *
+	 * @return a stream of {@link XMLAttribute}s
+	 */
+	public Stream<XMLAttribute> streamAttributes() {
+		return attributes.stream();
+	}
+
+	/**
 	 * Retrieves an attribute by index.
 	 *
 	 * @param index the index of the attribute
@@ -323,7 +352,7 @@ public class XMLNode extends XMLObject {
 	 * @return an {@link Optional} containing the first attribute matching the predicate
 	 */
 	public Optional<XMLAttribute> optAttribute(Predicate<XMLAttribute> predicate) {
-		return attributes.stream().filter(predicate).findFirst();
+		return streamAttributes().filter(predicate).findFirst();
 	}
 
 	/**
@@ -367,7 +396,7 @@ public class XMLNode extends XMLObject {
 	 * @return a list of {@link XMLAttribute}s matching the predicate
 	 */
 	public List<XMLAttribute> getAttributes(Predicate<XMLAttribute> predicate) {
-		return attributes.stream().filter(predicate).collect(Collectors.toList());
+		return streamAttributes().filter(predicate).collect(Collectors.toList());
 	}
 
 	/**
@@ -446,6 +475,16 @@ public class XMLNode extends XMLObject {
 	}
 
 	/**
+	 * Sorts attributes by names.
+	 *
+	 * @return a reference to this object
+	 */
+	public XMLNode sortAttributes() {
+		Collections.sort(attributes);
+		return this;
+	}
+
+	/**
 	 * Removes all attributes.
 	 *
 	 * @return a reference to this object
@@ -463,7 +502,7 @@ public class XMLNode extends XMLObject {
 	 * @return {@code true} if an attribute with the name exists, {@code false} otherwise
 	 */
 	public boolean containsAttributeName(String name) {
-		return attributes.stream().anyMatch(XMLPredicates.withName(name));
+		return streamAttributes().anyMatch(XMLPredicates.withName(name));
 	}
 
 	/**
@@ -541,6 +580,18 @@ public class XMLNode extends XMLObject {
 		return !hasParent();
 	}
 
+	@Override
+	public int compareTo(XMLNode other) {
+		if (tag == other.tag)
+			return 0;
+		else if (Objects.isNull(tag))
+			return -1;
+		else if (Objects.isNull(other.tag))
+			return 1;
+		else
+			return tag.compareTo(other.tag);
+	}
+
 	/**
 	 * Converts the node to its XML string representation with default tab indentation.
 	 *
@@ -569,9 +620,9 @@ public class XMLNode extends XMLObject {
 		String nodeString = null;
 		String textString = null;
 		if (hasAttributes())
-			builder.append(" ").append(attributes.stream().map(XMLAttribute::toXMLString).collect(Collectors.joining(" ")));
+			builder.append(" ").append(streamAttributes().map(XMLAttribute::toXMLString).collect(Collectors.joining(" ")));
 		if (hasNodes())
-			nodeString = nodes.stream().map(node -> node.toXMLString(indent, level + 1)).collect(Collectors.joining("\n"));
+			nodeString = streamNodes().map(node -> node.toXMLString(indent, level + 1)).collect(Collectors.joining("\n"));
 		else if (hasText())
 			textString = escapeString(text);
 		if (Objects.isNull(nodeString) && Objects.isNull(textString))
